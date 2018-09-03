@@ -5,8 +5,6 @@ RUN mkdir -p /opt && mkdir -p /tmp && wget https://github.com/ProcessMaker/bpm/a
     unzip -x /tmp/develop.zip -q -d /opt && mv /opt/bpm-develop /opt/processmaker
 
 # Copying server configuration files
-# TODO move next line to the base image (kytoonlabs/bpm4-base)
-RUN apk add rsync zlib-dev libpng-dev gd pngquant autoconf automake make gcc g++ libtool pkgconfig libmcrypt-dev nasm
 COPY files /tmp/files
 RUN rsync --recursive --verbose --backup /tmp/files/ / && rm -rf /tmp/files
 
@@ -14,11 +12,13 @@ RUN rsync --recursive --verbose --backup /tmp/files/ / && rm -rf /tmp/files
 WORKDIR /opt/processmaker
 
 # Preparing PHP modules
-RUN docker-php-ext-install pcntl zip
+RUN docker-php-ext-install pcntl zip pdo_mysql
 
 # Preparing ProcessMaker project
-USER www-data
-RUN composer install 
+USER nginx
+RUN composer install && \
+    php artisan vendor:publish --provider="Laravel\Horizon\HorizonServiceProvider" && \
+    php artisan passport:keys
 USER root
 RUN npm i npm@latest -g && npm install && npm run dev
 
@@ -27,12 +27,10 @@ RUN mkdir -p /var/log/supervisor && \
     mkdir -p /var/run/supervisor && \
     mkdir -p /usr/local/var/run/php-fpm && \
     mkdir -p /var/log/php-fpm && \
-    rm /etc/nginx/conf.d/default.conf  
-    # && \
-    # rm /usr/local/etc/php-fpm.d/www.conf
+    rm /etc/nginx/conf.d/default.conf && \
+    chown -R nginx:nginx /opt/processmaker
 
-
-EXPOSE 80
+EXPOSE 80 443 6001
 STOPSIGNAL SIGTERM
 
 ENTRYPOINT ["supervisord", "--nodaemon", "--configuration", "/etc/supervisord.conf"]

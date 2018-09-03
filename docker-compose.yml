@@ -1,0 +1,22 @@
+version: '3'
+services:
+  processmaker:
+    build: .
+    ports: 
+      - 8400:443
+      - 6001:6001
+    depends_on:
+      - db
+      - redis
+  redis:
+    image: redis
+    restart: always
+  db:
+    image: mysql:5.7
+    #command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports: 
+      - 33060:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: 'bpm4'
