@@ -30,6 +30,12 @@ RUN mkdir -p /var/log/supervisor && \
     rm /etc/nginx/conf.d/default.conf && \
     chown -R nginx:nginx /opt/processmaker
 
+VOLUME /var/lib/docker
+
+RUN groupadd docker && usermod -aG docker nginx
+RUN mkdir -p /home/vagrant && chown -R nginx:nginx /home/vagrant && \
+    ln -s /usr/local/bin/docker /usr/bin/docker
+
 EXPOSE 80 443 6001
 STOPSIGNAL SIGTERM
 

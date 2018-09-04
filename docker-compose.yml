@@ -5,6 +5,7 @@ services:
     ports: 
       - 8400:443
       - 6001:6001
+    privileged: true
     depends_on:
       - db
       - redis
