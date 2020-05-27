@@ -12,7 +12,7 @@ RUN rsync --recursive --verbose --backup /tmp/files/ / && rm -rf /tmp/files
 WORKDIR /opt/processmaker
 
 # Preparing PHP modules
-RUN docker-php-ext-install pcntl zip pdo_mysql
+RUN docker-php-ext-install pcntl zip pdo_mysql exif
 
 # Preparing ProcessMaker project
 USER nginx
