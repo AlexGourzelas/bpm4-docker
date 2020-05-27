@@ -18,7 +18,7 @@ RUN docker-php-ext-install pcntl zip pdo_mysql exif
 USER nginx
 RUN composer install && \
     //php artisan vendor:publish --provider="Laravel\Horizon\HorizonServiceProvider" && \
-    php artisan processmaker:install && \
+    //php artisan processmaker:install && \
     php artisan passport:keys
 USER root
 RUN npm i npm@latest -g && npm install && npm run dev
